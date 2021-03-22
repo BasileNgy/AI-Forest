@@ -6,8 +6,8 @@ public class Player {
     int x;
     int y;
 
-    Capteur capt;
-    Effecteur effect;
+    Capteur capteur;
+    Effecteur effecteur;
 
     ArrayList<Point2D> pathTriedList;
 
@@ -15,8 +15,8 @@ public class Player {
     {
         x = 0;
         y = 0;
-        capt = capteurs;
-        effect = effecteur;
+        capteur = capteurs;
+        effecteur = effecteur;
         pathTriedList = new ArrayList<>();
     }
 

@@ -81,14 +81,14 @@ public class Environnement
                 {
                     if (randMonster < probaMonstre)
                     {
-                        map[i][j].AddElement(Element.MONSTRE);
-                        SetUpAdjacentesRoom(map[i][j], Element.ODEUR);
+                        if(map[i][j].AddElement(Element.MONSTRE))
+                            SetUpAdjacentesRoom(map[i][j], Element.ODEUR);
                     }
 
                     if (randCrevasse < probaCrevasse)
                     {
-                        map[i][j].AddElement(Element.CREVASSE);
-                        SetUpAdjacentesRoom(map[i][j], Element.VENTEUSE);
+                        if(map[i][j].AddElement(Element.CREVASSE))
+                            SetUpAdjacentesRoom(map[i][j], Element.VENTEUSE);
                     }
                 }
             }

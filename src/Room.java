@@ -19,33 +19,43 @@ public class Room
         this.y = y;
     }
 
-    public void AddElement(Element e)
+    public boolean AddElement(Element e)
     {
+        boolean added = true;
         switch (e)
         {
             case ODEUR:
                 if(!elementList.contains(Element.ODEUR))
                     elementList.add(e);
+                added = true;
                 break;
 
             case SORTIE:
                 elementList.add(e);
+                added = true;
                 break;
 
             case MONSTRE:
             case CREVASSE:
                 if(!elementList.contains(Element.SORTIE))
+                {
                     elementList.add(e);
+                    added = true;
+                }else
+                    added = false;
                 break;
 
             case VENTEUSE:
                 if(!elementList.contains(Element.VENTEUSE))
                     elementList.add(e);
+                added = true;
                 break;
 
             default:
+                added = false;
                 break;
         }
+        return added;
     }
 
     public void SetGraphicText()
