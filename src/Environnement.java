@@ -7,7 +7,7 @@ public class Environnement
     int size;
 
     //Probabilités spawn
-    float probaMonstre = 0.2f;
+    float probaMonstre = 0.1f;
     float probaCrevasse = 0.1f;
 
     public Environnement(int n)

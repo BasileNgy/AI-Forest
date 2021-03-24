@@ -6,13 +6,23 @@ public class Player {
     int x;
     int y;
 
-    ArrayList<Room> pathTriedList;
+    Capteur capteur;
+    Effecteur effecteur;
 
-    public Player()
+    ArrayList<Point2D> pathTriedList;
+
+    public Player(Capteur capteurs, Effecteur effecteur)
     {
         x = 0;
         y = 0;
+        capteur = capteurs;
+        effecteur = effecteur;
         pathTriedList = new ArrayList<>();
     }
 
+    public void SetPosition(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
 }

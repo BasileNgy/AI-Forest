@@ -3,11 +3,6 @@ enum Orientation
     HAUT,DROITE,BAS,GAUCHE
 }
 
-enum Action
-{
-    HAUT,DROITE,BAS,GAUCHE,TIRER,SORTIR
-}
-
 public class Effecteur
 {
 
@@ -38,31 +33,24 @@ public class Effecteur
         p.x -= 1;
     }
 
-    public void MovePlayer(Player p, Action action)
-    {
-        switch (action) {
-            case HAUT -> p.y -= 1;
-            case DROITE -> p.x += 1;
-            case BAS -> p.y += 1;
-            case GAUCHE -> p.x -= 1;
-        }
-    }
-
-    public void Teleport(Player p, int x, int y)
-    {
-        p.x = x;
-        p.y = y;
-    }
-
     public void Tirer(Player p, Orientation orient)
     {
         int x = p.x;
         int y = p.y;
-        switch (orient) {
-            case HAUT -> y -= 1;
-            case DROITE -> x += 1;
-            case BAS -> y += 1;
-            case GAUCHE -> x -= 1;
+        switch(orient)
+        {
+            case HAUT:
+                y -= 1;
+                break;
+            case DROITE:
+                x += 1;
+                break;
+            case BAS:
+                y += 1;
+                break;
+            case GAUCHE:
+                x -= 1;
+                break;
         }
 
         if(map[x][y].elementList.contains(Element.MONSTRE))

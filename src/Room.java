@@ -5,24 +5,18 @@ enum Element
     CREVASSE, SORTIE, VENTEUSE, ODEUR, MONSTRE
 }
 
-public class Room  implements Comparable<Room>
+public class Room
 {
     public int x;
     public int y;
     public ArrayList<Element> elementList;
     String graphicText = "";
 
-    //Utilisé par l'agent
-    public int nivDanger;
-    public boolean discoveredRoom;
-
     public Room(int x, int y)
     {
         elementList = new ArrayList<>();
         this.x = x;
         this.y = y;
-        nivDanger = 0;
-        discoveredRoom = false;
     }
 
     public boolean AddElement(Element e)
@@ -33,10 +27,12 @@ public class Room  implements Comparable<Room>
             case ODEUR:
                 if(!elementList.contains(Element.ODEUR))
                     elementList.add(e);
+                added = true;
                 break;
 
             case SORTIE:
                 elementList.add(e);
+                added = true;
                 break;
 
             case MONSTRE:
@@ -44,6 +40,7 @@ public class Room  implements Comparable<Room>
                 if(!elementList.contains(Element.SORTIE))
                 {
                     elementList.add(e);
+                    added = true;
                 }else
                     added = false;
                 break;
@@ -51,6 +48,7 @@ public class Room  implements Comparable<Room>
             case VENTEUSE:
                 if(!elementList.contains(Element.VENTEUSE))
                     elementList.add(e);
+                added = true;
                 break;
 
             default:
@@ -76,10 +74,5 @@ public class Room  implements Comparable<Room>
                 case ODEUR -> graphicText += " Ode";
             }
         }
-    }
-
-    @Override
-    public int compareTo(Room r) {
-        return this.nivDanger - r.nivDanger;
     }
 }
