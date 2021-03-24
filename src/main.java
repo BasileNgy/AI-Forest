@@ -9,10 +9,16 @@ public class main
         Environnement envir = new Environnement(n);
         envir.SetUpInitialState();
 
-        Player player = new Player(new Capteur(envir.map), new Effecteur(envir.map));
+        Player player = new Player();
 
         Graphic graph = new Graphic(n);
 
-        graph.UpdateGraphic(envir.map, player);
+        Agent agent = new Agent(player, new Capteur(envir.map), new Effecteur(envir.map), n);
+
+        do {
+            graph.UpdateGraphic(envir.map, player);
+            agent.Resolution();
+        }while(true);
+
     }
 }

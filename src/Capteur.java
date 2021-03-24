@@ -7,18 +7,29 @@ public class Capteur
         this.map = map;
     }
 
-    public boolean isOdeur(int x, int y)
+    public boolean isOdeur(Player p)
     {
-        return map[x][y].elementList.contains(Element.ODEUR);
+        return map[p.x][p.y].elementList.contains(Element.ODEUR);
     }
 
-    public boolean isVent(int x, int y)
+    public boolean isVent(Player p)
     {
-        return map[x][y].elementList.contains(Element.VENTEUSE);
+        return map[p.x][p.y].elementList.contains(Element.VENTEUSE);
     }
 
-    public boolean isLumiere(int x, int y)
+    public boolean isLumiere(Player p)
     {
-        return map[x][y].elementList.contains(Element.SORTIE);
+        return map[p.x][p.y].elementList.contains(Element.SORTIE);
+    }
+
+
+    public boolean isMonstre(Player p)
+    {
+        return map[p.x][p.y].elementList.contains(Element.MONSTRE);
+    }
+
+    public boolean isCrevasse(Player p)
+    {
+        return map[p.x][p.y].elementList.contains(Element.CREVASSE);
     }
 }
