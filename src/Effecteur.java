@@ -13,6 +13,12 @@ public class Effecteur
         this.map = map;
     }
 
+    public void Teleportation(int x, int y, Player p)
+    {
+        p.x = x;
+        p.y = y;
+    }
+
     public void Haut(Player p)
     {
         p.y -= 1;
