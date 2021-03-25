@@ -1,16 +1,13 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-/out/
-
 # Datasource local storage ignored files
 /../../../../../../../:\Users\Basile\source\repos\AIForest\.idea/dataSources/
 /dataSources.local.xml
 
-# Clem local file
 
-D:\UQAC-DD\Cours\Session d'hiver 2021\IA\TP3\AI-Forest\.idea\codeStyles
-D:\UQAC-DD\Cours\Session d'hiver 2021\IA\TP3\AI-Forest\.idea\aws.xml
 # Editor-based HTTP Client requests
 /httpRequests/
 /out/
+/aws.xml
+/codeStyles/
