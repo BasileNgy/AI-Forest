@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 enum Element
 {
-    CREVASSE, SORTIE, VENTEUSE, ODEUR, MONSTRE
+    CREVASSE, SORTIE, VENTEUSE, ODEUR, MONSTRE, LUMIERE
 }
 
 public class Room

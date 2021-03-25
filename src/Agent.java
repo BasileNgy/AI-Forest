@@ -15,6 +15,10 @@ public class Agent {
         this.size = size;
         this.player = p;
         factsList = new ArrayList<>();
+        for (int j = 0; j < size; j++) {
+            for (int i = 0; i < size; i++)
+                factsList.add(new Fact(i,j));
+        }
     }
 
     public void Resolution()
@@ -29,18 +33,23 @@ public class Agent {
     {
         ArrayList<Element> elementsDetected = new ArrayList<>();
 
-        if(capteur.isOdeur())
-            elementsDetected.add(Element.ODEUR);
         if(capteur.isLumiere())
             elementsDetected.add(Element.SORTIE);
+        if(capteur.isOdeur())
+        {
+            elementsDetected.add(Element.ODEUR);
+            UpdateFringe(Element.MONSTRE, GetListAdjacentFactUnKnownRooms());
+        }
         if(capteur.isVent())
+        {
             elementsDetected.add(Element.VENTEUSE);
+            UpdateFringe(Element.MONSTRE, GetListAdjacentFactUnKnownRooms());
+        }
 
         if(capteur.isMonstre())
             elementsDetected.add(Element.MONSTRE);
         if(capteur.isCrevasse())
             elementsDetected.add(Element.CREVASSE);
-
 
         for (Fact f : factsList)
         {
@@ -49,46 +58,49 @@ public class Agent {
                 f.elementList.clear();
                 f.elementList.addAll(elementsDetected);
                 f.discoveredRoom = true;
-                return;
             }
         }
+    }
 
-        Fact fact = new Fact(player.x, player.y);
-        fact.elementList.addAll(elementsDetected);
-        fact.discoveredRoom = true;
-        factsList.add(fact);
+    private void UpdateFringe(Element e, ArrayList<Fact> adjFacts)
+    {
+        for (Fact f : adjFacts)
+        {
+            f.elementList.add(e);
+        }
     }
 
     /*
-    Getter de la list des rooms frontières
+    Getter de la list des facts adjacents à une room
      */
-    private ArrayList<Room> GetListAdjacentUnKnownRooms(Room r)
+    private ArrayList<Fact> GetListAdjacentFactUnKnownRooms()
     {
-        ArrayList<Room> maskedRooms = new ArrayList();
+        ArrayList<Fact> maskedFacts = new ArrayList();
 
-
-        if(r.y > 0)
-        {
+        //Case inconnu Haut (détermine si le joueur est au bord du terrain => pas de case adjacente en haut)
+        if (player.y > 0) {
             for (Fact f : factsList)
-            {
-                if(f.x == r.x && f.y == r.y)
-                {
-
-                }
-            }
+                if (f.x == player.x && f.y == player.y - 1 && !f.discoveredRoom)
+                    maskedFacts.add(f);
         }
-        if(r.x < size)
-        {
-
+        //Case inconnu Droite
+        if (player.x < size) {
+            for (Fact f : factsList)
+                if (f.x == player.x + 1 && f.y == player.y && !f.discoveredRoom)
+                    maskedFacts.add(f);
         }
-        if(r.y < size)
-        {
-
+        //Case inconnu Bas
+        if (player.y < size) {
+            for (Fact f : factsList)
+                if (f.x == player.x && f.y == player.y + 1 && !f.discoveredRoom)
+                    maskedFacts.add(f);
         }
-        if(r.x > 0)
-        {
-
+        //Case inconnu Gauche
+        if (player.x > 0) {
+            for (Fact f : factsList)
+                if (f.x == player.x - 1 && f.y == player.y && !f.discoveredRoom)
+                    maskedFacts.add(f);
         }
-        return maskedRooms;
+        return maskedFacts;
     }
 }

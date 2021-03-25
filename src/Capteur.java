@@ -21,7 +21,7 @@ public class Capteur
 
     public boolean isLumiere()
     {
-        return map[p.x][p.y].elementList.contains(Element.SORTIE);
+        return map[p.x][p.y].elementList.contains(Element.LUMIERE);
     }
 
 
