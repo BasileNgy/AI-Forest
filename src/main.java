@@ -15,5 +15,6 @@ public class main
         Graphic graph = new Graphic(n);
 
         graph.UpdateGraphic(envir.map, player);
+        agent.Resolution();
     }
 }

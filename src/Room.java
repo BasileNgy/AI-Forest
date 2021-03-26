@@ -19,6 +19,8 @@ public class Room
         elementList = new ArrayList<>();
         this.x = x;
         this.y = y;
+        neighbors = new ArrayList<>();
+        facts = new Fact(x,y);
     }
 
     public boolean AddElement(Element e)

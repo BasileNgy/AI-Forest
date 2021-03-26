@@ -1,13 +1,16 @@
-interface RuleAction{
+interface RulePremise{
+    boolean check(Room room);
+}
+interface RuleConsequence{
     void apply(Room room);
 }
 
 public class Rule {
-    RuleAction premise;
-    RuleAction consequence;
+    RulePremise premise;
+    RuleConsequence consequence;
 
 
-    public Rule( RuleAction _premise, RuleAction _consequence){
+    public Rule( RulePremise _premise, RuleConsequence _consequence){
         premise = _premise;
         consequence = _consequence;
     }
