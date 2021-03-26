@@ -1,106 +1,99 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Agent {
 
-    public ArrayList<Fact> factsList;
     private int size;
-    private Capteur capteur;
-    private Effecteur effecteur;
+    private final Capteur capteur;
+    private final Effecteur effecteur;
     private Player player;
+    private final Room[][] map;
+    private RulesCreator rulesCreator;
+    public ArrayList<HashMap<Rule, Room>> applicableRules;
+    public ArrayList<Room> activeRoomsList;
 
-    public Agent(Capteur capteur, Effecteur effecteur, Player p, int size)
+    public Agent(Capteur capteur, Effecteur effecteur, Player p, int size, Room[][] map)
     {
         this.capteur = capteur;
         this.effecteur = effecteur;
         this.size = size;
         this.player = p;
-        factsList = new ArrayList<>();
-        for (int j = 0; j < size; j++) {
-            for (int i = 0; i < size; i++)
-                factsList.add(new Fact(i,j));
-        }
+        this.map = map;
+        rulesCreator = new RulesCreator();
     }
 
     public void Resolution()
     {
         //maj des faits avec capteurs
         UpdateFacts();
+
         //application des règles, choix de l'action
+        RulesApplication();
+
         //action
+    }
+
+    private void RulesApplication()
+    {
+        GetListRoomsFrontiereAndAdjacente();
+        for(Room r : activeRoomsList)
+            applicableRules.add(rulesCreator.GetRuleApplicable(r));
+
+
     }
 
     private void UpdateFacts()
     {
-        ArrayList<Element> elementsDetected = new ArrayList<>();
-
         if(capteur.isLumiere())
-            elementsDetected.add(Element.SORTIE);
+            map[player.x][player.y].facts.isShiny = true;
         if(capteur.isOdeur())
-        {
-            elementsDetected.add(Element.ODEUR);
-            UpdateFringe(Element.MONSTRE, GetListAdjacentFactUnKnownRooms());
-        }
+            map[player.x][player.y].facts.isSmelly = true;
         if(capteur.isVent())
-        {
-            elementsDetected.add(Element.VENTEUSE);
-            UpdateFringe(Element.MONSTRE, GetListAdjacentFactUnKnownRooms());
-        }
+            map[player.x][player.y].facts.isWindy = true;
 
-        if(capteur.isMonstre())
-            elementsDetected.add(Element.MONSTRE);
-        if(capteur.isCrevasse())
-            elementsDetected.add(Element.CREVASSE);
-
-        for (Fact f : factsList)
+        if(capteur.isMonstre() && capteur.isCrevasse())
         {
-            if(f.x == player.x && f.y == player.y)
-            {
-                f.elementList.clear();
-                f.elementList.addAll(elementsDetected);
-                f.discoveredRoom = true;
-            }
+            if(capteur.isMonstre())
+                map[player.x][player.y].facts.containsMonster = true;
+            if(capteur.isCrevasse())
+                map[player.x][player.y].facts.containsCanyon = true;
+            //TODO appel un gameover
         }
-    }
+        else
+            map[player.x][player.y].facts.isSafe = true;
 
-    private void UpdateFringe(Element e, ArrayList<Fact> adjFacts)
-    {
-        for (Fact f : adjFacts)
-        {
-            f.elementList.add(e);
-        }
+        map[player.x][player.y].facts.isKnown = true;
     }
 
     /*
-    Getter de la list des facts adjacents à une room
+    Getter des rooms Frontières et des rooms connues adjacentes aux frontières
      */
-    private ArrayList<Fact> GetListAdjacentFactUnKnownRooms()
+    private void GetListRoomsFrontiereAndAdjacente()
     {
-        ArrayList<Fact> maskedFacts = new ArrayList();
+        activeRoomsList = new ArrayList<>();
 
-        //Case inconnu Haut (détermine si le joueur est au bord du terrain => pas de case adjacente en haut)
-        if (player.y > 0) {
-            for (Fact f : factsList)
-                if (f.x == player.x && f.y == player.y - 1 && !f.discoveredRoom)
-                    maskedFacts.add(f);
-        }
-        //Case inconnu Droite
-        if (player.x < size) {
-            for (Fact f : factsList)
-                if (f.x == player.x + 1 && f.y == player.y && !f.discoveredRoom)
-                    maskedFacts.add(f);
-        }
-        //Case inconnu Bas
-        if (player.y < size) {
-            for (Fact f : factsList)
-                if (f.x == player.x && f.y == player.y + 1 && !f.discoveredRoom)
-                    maskedFacts.add(f);
-        }
-        //Case inconnu Gauche
-        if (player.x > 0) {
-            for (Fact f : factsList)
-                if (f.x == player.x - 1 && f.y == player.y && !f.discoveredRoom)
-                    maskedFacts.add(f);
-        }
-        return maskedFacts;
+        for(int j=0;j<size;j++)
+            for(int i=0;i<size;i++)
+            {
+                if(map[i][j].facts.isKnown)
+                {
+                    for(Room r : map[i][j].neighbors)
+                        if(!r.facts.isKnown)
+                        {
+                            activeRoomsList.add(map[i][j]);
+                            continue;
+                        }
+                }
+                else
+                {
+                    for(Room r : map[i][j].neighbors)
+                        if(r.facts.isKnown)
+                        {
+                            activeRoomsList.add(map[i][j]);
+                            continue;
+                        }
+                }
+            }
     }
+
 }

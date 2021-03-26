@@ -10,6 +10,8 @@ public class Room
     public int x;
     public int y;
     public ArrayList<Element> elementList;
+    public Fact facts;
+    public ArrayList<Room> neighbors;
     String graphicText = "";
 
     public Room(int x, int y)

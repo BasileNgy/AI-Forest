@@ -19,8 +19,12 @@ public class Environnement
                 map[i][j] = new Room(i,j);
     }
 
+    /*
+    Comptabilise les voisins et mets en place les différents éléments dans les rooms
+     */
     public void SetUpInitialState()
     {
+        SetUpNeighbourRoom();
         SetUpSortie();
         SetUpMonstreCrevasse();
 
@@ -82,13 +86,15 @@ public class Environnement
                     if (randMonster < probaMonstre)
                     {
                         if(map[i][j].AddElement(Element.MONSTRE))
-                            SetUpAdjacentesRoom(map[i][j], Element.ODEUR);
+                            for(Room r : map[i][j].neighbors)
+                                r.AddElement(Element.ODEUR);
                     }
 
                     if (randCrevasse < probaCrevasse)
                     {
                         if(map[i][j].AddElement(Element.CREVASSE))
-                            SetUpAdjacentesRoom(map[i][j], Element.VENTEUSE);
+                            for(Room r : map[i][j].neighbors)
+                                r.AddElement(Element.VENTEUSE);
                     }
                 }
             }
@@ -96,22 +102,27 @@ public class Environnement
     }
 
     /*
-    Ajoute l'élément Odeur ou Venteuse sur les cases adjacentes aux Monstres et aux Crevasses
+    Liste les cases voisines les unes des autres et les ajoute à l'attribut liste des room
      */
-    private void SetUpAdjacentesRoom(Room r,Element e)
+    private void SetUpNeighbourRoom()
     {
-        //UP
-        if(r.y != 0)
-            map[r.x][r.y-1].AddElement(e);
-        //RIGHT
-        if(r.x != size-1)
-            map[r.x+1][r.y].AddElement(e);
-        //DOWN
-        if(r.y != size-1)
-            map[r.x][r.y+1].AddElement(e);
-        //LEFT
-        if(r.x != 0)
-            map[r.x-1][r.y].AddElement(e);
+        for (int j = 0; j < size; j++) {
+            for (int i = 0; i < size; i++) {
+                Room r = map[i][j];
+                //UP
+                if(r.y != 0)
+                    r.neighbors.add(map[r.x][r.y-1]);
+                //RIGHT
+                if(r.x != size-1)
+                    r.neighbors.add(map[r.x+1][r.y]);
+                //DOWN
+                if(r.y != size-1)
+                    r.neighbors.add(map[r.x][r.y+1]);
+                //LEFT
+                if(r.x != 0)
+                    r.neighbors.add(map[r.x-1][r.y]);
+            }
+        }
     }
 
 }

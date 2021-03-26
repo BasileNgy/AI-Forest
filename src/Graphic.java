@@ -36,6 +36,8 @@ public class Graphic extends JFrame
                 String text = map[i][j].graphicText;
                 if(i == p.x && j == p.y)
                     text += " Joueu";
+                if(map[i][j].facts.isKnown)
+                    labelList.get(labelIndex).setForeground(Color.green);
                 labelList.get(labelIndex).setText(text);
                 labelIndex ++;
             }
