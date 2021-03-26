@@ -5,7 +5,7 @@ interface RuleConsequence{
     void apply(Room room);
 }
 
-public class Rule {
+public class Rule implements Comparable{
     RulePremise premise;
     RuleConsequence consequence;
 
@@ -13,5 +13,11 @@ public class Rule {
     public Rule( RulePremise _premise, RuleConsequence _consequence){
         premise = _premise;
         consequence = _consequence;
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
     }
 }

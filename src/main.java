@@ -16,5 +16,7 @@ public class main
 
         graph.UpdateGraphic(envir.map, player);
         agent.Resolution();
+
+        //TODO boucle infinie foret
     }
 }

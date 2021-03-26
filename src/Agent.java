@@ -52,12 +52,9 @@ public class Agent {
         Room initialRoom = map[player.x][player.y];
 
         //maj des faits avec capteurs
-        DetectEnvironment(initialRoom);
-        knownRooms.add(initialRoom);
-
-        if(initialRoom.facts.containsExit){
+        if(DetectEnvironment(initialRoom))
             return true;
-        }
+
 
         //Initialisation de la frontiere
         UpdateFringe();
@@ -67,8 +64,11 @@ public class Agent {
 
     //Vérifie quels éléments se trouvent sur la case explorée. S'il y a un monstre ou une crevasse, on met à jour les
     // faits de la case, puis on tue le joueur sans ajouter la case aux cases connues.
-    private void DetectEnvironment(Room room)
+    private boolean DetectEnvironment(Room room)
     {
+
+
+        knownRooms.add(room);
 
         room.facts.isEmpty = false;
         room.facts.isShiny = false;
@@ -82,21 +82,19 @@ public class Agent {
         room.facts.containsCanyon = false;
         room.facts.containsExit = false;
 
-        if(capteur.isThereNothing()){
-            room.facts.isEmpty = true;
-            room.facts.isSafe = true;
-            room.facts.isKnown = true;
-            return ;
-        }
-
-
-
         if(capteur.isItShining()){
             room.facts.isShiny = true;
             room.facts.isSafe = true;
             room.facts.isKnown = true;
             room.facts.containsExit = true;
-            return;
+            return true;
+        }
+
+        if(capteur.isThereNothing()){
+            room.facts.isEmpty = true;
+            room.facts.isSafe = true;
+            room.facts.isKnown = true;
+            return false;
         }
 
         if(capteur.isThereSmell())
@@ -113,11 +111,12 @@ public class Agent {
 
         if(room.facts.containsCanyon || room.facts.containsMonster){
             //TODO appel un gameover
-            return ;
+            return  false;
         }
 
         room.facts.isSafe = true;
         room.facts.isKnown = true;
+        return false;
     }
 
     //Met à jour la frontière
@@ -139,7 +138,8 @@ public class Agent {
     private void UpdateInterestingRooms() {
         interestingRooms.clear();
         for(Room fringeRoom : fringe){
-            interestingRooms.add(fringeRoom);
+            if(!interestingRooms.contains(fringeRoom))
+                interestingRooms.add(fringeRoom);
             for(Room neighbor : fringeRoom.neighbors){
                 if(neighbor.facts.isKnown && !interestingRooms.contains(neighbor))
                     interestingRooms.add(neighbor);
