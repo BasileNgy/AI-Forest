@@ -5,7 +5,7 @@ enum Element
     CREVASSE, SORTIE, VENTEUSE, ODEUR, MONSTRE, LUMIERE
 }
 
-public class Room
+public class Room implements Comparable<Room>
 {
     public int x;
     public int y;
@@ -78,5 +78,19 @@ public class Room
                 case ODEUR -> graphicText += " Ode";
             }
         }
+    }
+
+    @Override
+    public int compareTo(Room o) {
+        return this.facts.danger - o.facts.danger;
+    }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "x=" + x +
+                ", y=" + y +
+                ", elementList=" + elementList + '\'' +
+                '}';
     }
 }

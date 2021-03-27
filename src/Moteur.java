@@ -21,7 +21,7 @@ public class Moteur {
 
         this.inferenceRooms = inferenceRooms;
         for(Room room : inferenceRooms ){
-            System.out.println("Interesting room in ["+room.x+","+room.y+"]");
+            //System.out.println("Interesting room in ["+room.x+","+room.y+"]");
         }
         applicableRules.clear();
         for(Rule rule : markedRules.keySet()){
@@ -35,16 +35,16 @@ public class Moteur {
                 if(applicableRules.get(rule).isEmpty())
                     applicableRules.remove(rule);
             }
-            System.out.println("Applicable rules "+applicableRules);
+            //System.out.println("Applicable rules "+applicableRules);
             if(!applicableRules.isEmpty()){
                 Map.Entry<Rule, ArrayList<Room>> firstRuleApplicable = applicableRules.entrySet().iterator().next();
                 Rule ruleToApply = firstRuleApplicable.getKey();
                 Room roomToApply = firstRuleApplicable.getValue().get(0);
                 ruleToApply.consequence.apply(roomToApply);
                 markedRules.get(ruleToApply).add(roomToApply);
-                System.out.println("Applied rule "+ruleToApply+" on room ["+roomToApply.x+","+roomToApply.y+"]");
+                //System.out.println("Applied rule "+ruleToApply+" on room ["+roomToApply.x+","+roomToApply.y+"]");
             }
-            System.out.println("Marked rules " +markedRules);
+            //System.out.println("Marked rules " +markedRules);
 
         } while ( !applicableRules.isEmpty());
 
@@ -55,7 +55,7 @@ public class Moteur {
 
             if(!markedRules.get(rule).contains(room) && rule.premise.check(room))
                 applicableRules.get(rule).add(room);
-            else System.out.println("Can't apply rule "+rule+" to room ["+room.x+","+room.y+"]");
+            else ;//System.out.println("Can't apply rule "+rule+" to room ["+room.x+","+room.y+"]");
         }
     }
 

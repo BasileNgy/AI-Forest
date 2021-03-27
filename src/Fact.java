@@ -20,14 +20,18 @@ public class Fact {
     public boolean isWindy;
     public boolean isSmelly;
     public boolean isShiny;
-    public boolean isKnown;
+
+    //doutes
     public boolean mayContainMonster;
     public boolean mayContainCanyon;
-    public boolean isSafe;
 
+    //certitudes
+    public boolean isSafe;
     public boolean containsMonster;
     public boolean containsCanyon;
     public boolean containsExit;
+
+    public int danger;
 
     public Fact(int x, int y)
     {
@@ -35,6 +39,41 @@ public class Fact {
         this.y = y;
         elementList = new ArrayList<>();
         discoveredRoom = false;
-        isKnown = false;
+
+        isEmpty = false;
+        isShiny = false;
+        isSmelly = false;
+        isWindy = false;
+
+        isSafe = false;
+
+        mayContainMonster = false;
+        mayContainCanyon = false;
+
+        containsMonster = false;
+        containsCanyon = false;
+        containsExit = false;
     }
+
+    @Override
+    public String toString() {
+        return "Fact{" +
+                "x=" + x +
+                ", y=" + y +
+                ", elementList=" + elementList +
+                ", discoveredRoom=" + discoveredRoom +
+                ", isEmpty=" + isEmpty +
+                ", isWindy=" + isWindy +
+                ", isSmelly=" + isSmelly +
+                ", isShiny=" + isShiny +
+                ", mayContainMonster=" + mayContainMonster +
+                ", mayContainCanyon=" + mayContainCanyon +
+                ", isSafe=" + isSafe +
+                ", containsMonster=" + containsMonster +
+                ", containsCanyon=" + containsCanyon +
+                ", containsExit=" + containsExit +
+                ", danger=" + danger +
+                '}';
+    }
+
 }

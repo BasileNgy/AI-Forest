@@ -29,7 +29,7 @@ public class Capteur
 
     public boolean isItShining()
     {
-        return map[p.x][p.y].elementList.contains(Element.LUMIERE);
+        return map[p.x][p.y].elementList.contains(Element.SORTIE);
     }
 
 

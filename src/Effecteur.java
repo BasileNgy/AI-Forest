@@ -1,8 +1,3 @@
-enum Orientation
-{
-    HAUT,DROITE,BAS,GAUCHE
-}
-
 public class Effecteur
 {
 
@@ -13,61 +8,27 @@ public class Effecteur
         this.map = map;
     }
 
-    public void Teleportation(int x, int y, Player p)
+    public void Teleportation(Player p, Room r)
     {
-        p.x = x;
-        p.y = y;
+        p.x = r.x;
+        p.y = r.y;
+
+        System.out.println("Teleportation sur la case : "+ r.toString());
     }
 
-    public void Haut(Player p)
+    public void Tirer(Room r)
     {
-        p.y -= 1;
-    }
-
-    public void Droite(Player p)
-    {
-        p.x += 1;
-    }
-
-    public void Bas(Player p)
-    {
-        p.y += 1;
-    }
-
-    public void Gauche(Player p)
-    {
-        p.x -= 1;
-    }
-
-    public void Tirer(Player p, Orientation orient)
-    {
-        int x = p.x;
-        int y = p.y;
-        switch(orient)
+        if(r.elementList.contains(Element.MONSTRE))
         {
-            case HAUT:
-                y -= 1;
-                break;
-            case DROITE:
-                x += 1;
-                break;
-            case BAS:
-                y += 1;
-                break;
-            case GAUCHE:
-                x -= 1;
-                break;
-        }
-
-        if(map[x][y].elementList.contains(Element.MONSTRE))
-        {
-            map[x][y].elementList.remove(Element.MONSTRE);
+            r.elementList.remove(Element.MONSTRE);
             System.out.println("Un monstre a été tué");
+
+            for(Room neigh : r.neighbors)
+            {
+                neigh.elementList.remove(Element.ODEUR);
+            }
         }
+        System.out.println("Tirer sur la case : "+ r.toString());
     }
 
-    public void Sortir()
-    {
-
-    }
 }

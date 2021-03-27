@@ -1,5 +1,11 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+
+enum Action
+{
+    TIRER, TELEPORTER
+}
 
 public class Agent {
 
@@ -7,12 +13,14 @@ public class Agent {
     private final Capteur capteur;
     private final Effecteur effecteur;
     private Player player;
-    private final Room[][] map;
+    private Room[][] map;
     private RulesCreator rulesCreator;
     private Moteur moteur;
     public ArrayList<Room> interestingRooms;
     public ArrayList<Room> knownRooms;
     public ArrayList<Room> fringe;
+    public boolean exitReached;
+    public boolean playerIsDead;
 
     public Agent(Capteur capteur, Effecteur effecteur, Player p, int size, Room[][] map)
     {
@@ -27,38 +35,84 @@ public class Agent {
         interestingRooms = new ArrayList<>();
         knownRooms = new ArrayList<>();
         fringe = new ArrayList<>();
+        exitReached = false;
+        playerIsDead = false;
 
     }
 
     public void Resolution()
     {
-        if(InitAgentKnowledge()){
-            //TODO passer à la forêt suivante
-            return;
-        }
+        //Mets à jours les faits grace aux capteurs et recalcule les frontières
+        UpdateAgentKnowledge();
 
         //Lancement de l'inférence
         moteur.Inference(interestingRooms);
-        //Choix de l'action
+
+        //Choix de la prochaine action à effectuer
+        Action nextAction = NextActionChoice();
+
+        //Application de l'action
+        ActionApply(nextAction);
+    }
+
+    private void ActionApply(Action nextAction)
+    {
+        if(nextAction == Action.TIRER)
+            effecteur.Tirer(fringe.get(0));
+        else if(nextAction == Action.TELEPORTER)
+            effecteur.Teleportation(player, fringe.get(0));
+    }
+
+    private Action NextActionChoice()
+    {
+        CalculDanger();
+        if(fringe.get(0).facts.mayContainMonster)
+           return Action.TIRER;
+       else
+           return Action.TELEPORTER;
+    }
+
+    //Ordonnencement des rooms frontières selon leurs dangers
+    private void CalculDanger()
+    {
+        Collections.sort(fringe);
+        //TODO créer un choix probabiliste si 2 room ont le même niveau de danger
     }
 
 
     //Initialise la connaissance de l'agent : on ajoute la case sur laquelle il démarre à la liste des cases connues,
     // puis met à jour la frontière
-    private boolean InitAgentKnowledge(){
+    public boolean InitAgentKnowledge()
+    {
         knownRooms.clear();
 
         System.out.println("Player in ["+player.x+","+player.y+"]");
-        Room initialRoom = map[player.x][player.y];
+        int initX = player.x;
+        int initY = player.y;
 
         //maj des faits avec capteurs
-        if(DetectEnvironment(initialRoom))
+        if(DetectEnvironment(map[initX][initY]))
+        {
+            exitReached = true;
             return true;
-
+        }
 
         //Initialisation de la frontiere
         UpdateFringe();
         return false;
+    }
+
+    private void UpdateAgentKnowledge()
+    {
+        //maj des faits avec capteurs
+        if(DetectEnvironment(map[player.x][player.y]))
+        {
+            System.out.println("J'ai trouvé la sortie");
+            exitReached = true;
+        }
+
+        //Initialisation de la frontiere
+        UpdateFringe();
     }
 
 
@@ -66,8 +120,6 @@ public class Agent {
     // faits de la case, puis on tue le joueur sans ajouter la case aux cases connues.
     private boolean DetectEnvironment(Room room)
     {
-
-
         knownRooms.add(room);
 
         room.facts.isEmpty = false;
@@ -76,7 +128,6 @@ public class Agent {
         room.facts.isWindy = false;
 
         room.facts.isSafe = false;
-        room.facts.isKnown = false;
 
         room.facts.containsMonster = false;
         room.facts.containsCanyon = false;
@@ -85,7 +136,6 @@ public class Agent {
         if(capteur.isItShining()){
             room.facts.isShiny = true;
             room.facts.isSafe = true;
-            room.facts.isKnown = true;
             room.facts.containsExit = true;
             return true;
         }
@@ -93,8 +143,6 @@ public class Agent {
         if(capteur.isThereNothing()){
             room.facts.isEmpty = true;
             room.facts.isSafe = true;
-            room.facts.isKnown = true;
-            return false;
         }
 
         if(capteur.isThereSmell())
@@ -110,12 +158,13 @@ public class Agent {
             room.facts.containsCanyon = true;
 
         if(room.facts.containsCanyon || room.facts.containsMonster){
-            //TODO appel un gameover
+            playerIsDead = true;
             return  false;
         }
 
+        room.facts.discoveredRoom = true;
+
         room.facts.isSafe = true;
-        room.facts.isKnown = true;
         return false;
     }
 
@@ -124,11 +173,10 @@ public class Agent {
         fringe.clear();
         for(Room room : knownRooms){
             for(Room neigbhor : room.neighbors){
-                if(!neigbhor.facts.isKnown)
+                if(!neigbhor.facts.discoveredRoom && !fringe.contains(neigbhor))
                     fringe.add(neigbhor);
             }
         }
-
         UpdateInterestingRooms();
     }
 
@@ -141,7 +189,7 @@ public class Agent {
             if(!interestingRooms.contains(fringeRoom))
                 interestingRooms.add(fringeRoom);
             for(Room neighbor : fringeRoom.neighbors){
-                if(neighbor.facts.isKnown && !interestingRooms.contains(neighbor))
+                if(neighbor.facts.discoveredRoom && !interestingRooms.contains(neighbor))
                     interestingRooms.add(neighbor);
             }
         }
