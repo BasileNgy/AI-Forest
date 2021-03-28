@@ -4,19 +4,27 @@ public class Environnement
 {
 
     public Room[][] map;
+    private Room exit;
     int size;
 
     //Probabilités spawn
-    float probaMonstre = 0.1f;
+    float probaMonstre = 0.2f;
     float probaCrevasse = 0.1f;
+    Player player;
 
-    public Environnement(int n)
+    public Environnement(int n, Player player)
     {
+        this.player = player;
+        CreateNextForest(n);
+    }
+
+    public void CreateNextForest(int n){
         map = new Room[n][n];
         size = n;
         for(int j=0;j<size;j++)
             for(int i=0;i<size;i++)
                 map[i][j] = new Room(i,j);
+
     }
 
     /*
@@ -27,78 +35,11 @@ public class Environnement
         SetUpNeighbourRoom();
         SetUpSortie();
         SetUpMonstreCrevasse();
+        UpdateNeighborKnowledge();
 
         for(int j=0;j<size;j++)
             for(int i=0;i<size;i++)
                 map[i][j].SetGraphicText();
-    }
-
-    /*
-    Mets en place la sortie dans l'environnement, la sortie est unique et obligatoire
-    La probabilité augmente de 1/size² à chaque itération
-     */
-    private void SetUpSortie()
-    {
-        Random rand = new Random();
-        float randNbm;
-        float probaSortie = 1f/(size*size);
-
-        outer:
-        for(int j=0;j<size;j++)
-        {
-            for(int i=0;i<size;i++)
-            {
-                //sécurité pour s'assurer que la sortie soit assigné
-                if(j == size-1 && i == size-1)
-                    probaSortie = 1;
-
-                randNbm = rand.nextFloat();
-
-                if (randNbm <= probaSortie)
-                {
-                    map[i][j].AddElement(Element.SORTIE);
-                    break outer;
-                }
-                else
-                    probaSortie += probaSortie;
-            }
-        }
-    }
-
-    /*
-    Ajoute des monstres et des crevasses selon les probabilités définis en attributs
-     */
-    private void SetUpMonstreCrevasse()
-    {
-        Random rand = new Random();
-        float randMonster;
-        float randCrevasse;
-
-        for(int j=0;j<size;j++)
-        {
-            for(int i=0;i<size;i++)
-            {
-                randMonster = rand.nextFloat();
-                randCrevasse = rand.nextFloat();
-
-                if(i != 0 && j != 0)
-                {
-                    if (randMonster < probaMonstre)
-                    {
-                        if(map[i][j].AddElement(Element.MONSTRE))
-                            for(Room r : map[i][j].neighbors)
-                                r.AddElement(Element.ODEUR);
-                    }
-
-                    if (randCrevasse < probaCrevasse)
-                    {
-                        if(map[i][j].AddElement(Element.CREVASSE))
-                            for(Room r : map[i][j].neighbors)
-                                r.AddElement(Element.VENTEUSE);
-                    }
-                }
-            }
-        }
     }
 
     /*
@@ -124,5 +65,91 @@ public class Environnement
             }
         }
     }
+
+    /*
+    Mets en place la sortie dans l'environnement, la sortie est unique et obligatoire
+    La probabilité augmente de 1/size² à chaque itération
+     */
+    private void SetUpSortie()
+    {
+        Random rand = new Random();
+        float randNbm;
+        float probaSortie = 1f/(size*size);
+
+        outer:
+        for(int j=0;j<size;j++)
+        {
+            for(int i=0;i<size;i++)
+            {
+                //sécurité pour s'assurer que la sortie soit assignée
+                if(j == size-1 && i == size-1)
+                    probaSortie = 1;
+
+                randNbm = rand.nextFloat();
+
+                if (randNbm <= probaSortie)
+                {
+                    System.out.println("Sortie added to map ["+i+","+j+"]");
+                    map[i][j].AddElement(Element.SORTIE);
+
+                    exit = map[i][j];
+                    for (Room neighbor : exit.neighbors) {
+                        if(neighbor.x != player.x && neighbor.y != player.y)
+                        neighbor.AddElement(Element.MONSTRE);
+                    }
+                    break outer;
+                }
+                else
+                    probaSortie += probaSortie;
+            }
+        }
+//        map[1][0].AddElement(Element.SORTIE);
+    }
+
+    /*
+    Ajoute des monstres et des crevasses selon les probabilités définis en attributs
+     */
+    private void SetUpMonstreCrevasse() {
+        Random rand = new Random();
+        float randMonster;
+        float randCrevasse;
+
+        for (int j = 0; j < size; j++) {
+            for (int i = 0; i < size; i++) {
+                randMonster = rand.nextFloat();
+                randCrevasse = rand.nextFloat();
+
+                if (i != player.x && j != player.y && i != exit.x && j != exit.y) {
+                    if (randMonster < probaMonstre)
+                        map[i][j].AddElement(Element.MONSTRE);
+
+                    if (randCrevasse < probaCrevasse)
+                        map[i][j].AddElement(Element.CREVASSE);
+                }
+            }
+        }
+    }
+
+    public void UpdateNeighborKnowledge() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+
+                Room room = map[i][j];
+
+                if (room.elementList.contains(Element.MONSTRE) || room.elementList.contains(Element.CREVASSE)) {
+
+                    for (Room neighbor : room.neighbors) {
+                        if (room.elementList.contains(Element.MONSTRE))
+                            neighbor.AddElement(Element.ODEUR);
+
+                        if (room.elementList.contains(Element.CREVASSE))
+                            neighbor.AddElement(Element.VENTEUSE);
+
+                    }
+                }
+            }
+        }
+    }
+
 
 }

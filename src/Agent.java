@@ -1,13 +1,14 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
 enum Action
 {
     TIRER, TELEPORTER
 }
 
-public class Agent {
+public class Agent implements Runnable{
 
     private int size;
     private final Capteur capteur;
@@ -16,69 +17,138 @@ public class Agent {
     private Room[][] map;
     private RulesCreator rulesCreator;
     private Moteur moteur;
+    private Graphic graph;
     public ArrayList<Room> interestingRooms;
     public ArrayList<Room> knownRooms;
     public ArrayList<Room> fringe;
+    public HashMap<Room, Action> throwsTried;
     public boolean exitReached;
     public boolean playerIsDead;
+    static boolean timerEnded = true;
+    static boolean agentRunning;
 
-    public Agent(Capteur capteur, Effecteur effecteur, Player p, int size, Room[][] map)
+    public Agent(Capteur capteur, Effecteur effecteur)
     {
         this.capteur = capteur;
         this.effecteur = effecteur;
+        moteur = new Moteur();
+        rulesCreator = new RulesCreator(moteur);
+
+    }
+
+    public void ResetAgent(Player p, int size, Room[][] map, Graphic graph){
+        agentRunning = true;
         this.size = size;
         this.player = p;
         this.map = map;
+        this.graph = graph;
 
-        moteur = new Moteur();
-        rulesCreator = new RulesCreator(moteur);
         interestingRooms = new ArrayList<>();
         knownRooms = new ArrayList<>();
         fringe = new ArrayList<>();
+        throwsTried = new HashMap<>();
         exitReached = false;
         playerIsDead = false;
+//        timerEnded = true;
+    }
+
+    public boolean Resolution()
+    {
+        if(InitAgentKnowledge()){
+            graph.UpdateGraphic(map, player, fringe);
+            System.out.println("Exit reached !");
+            exitReached = true;
+            agentRunning = false;
+            return true;
+        }
+
+        graph.UpdateGraphic(map, player, fringe);
+        do {
+                try{
+                    Thread.sleep(750);
+                    //Lancement de l'inférence
+                    moteur.Inference(interestingRooms);
+                    //Choix de la prochaine action à effectuer
+                    Room nextActionRoom = NextRoomChoice();
+                    Action nextAction = NextActionChoice(nextActionRoom);
+
+                    //Application de l'action
+                    ActionApply(nextAction, nextActionRoom);
+                    //Mets à jours les faits grace aux capteurs et recalcule les frontières
+                    UpdateAgentKnowledge();
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+        }while(!exitReached && !playerIsDead);
+        if(playerIsDead){
+            System.out.println("I died :/");
+            agentRunning = false;
+            return false;
+        }
+        System.out.println("Found exit ! :)");
+        agentRunning = false;
+        return true;
 
     }
 
-    public void Resolution()
+    private void ActionApply(Action nextAction, Room nextRoom)
     {
-        //Mets à jours les faits grace aux capteurs et recalcule les frontières
-        UpdateAgentKnowledge();
+        if(nextAction == Action.TIRER){
 
-        //Lancement de l'inférence
-        moteur.Inference(interestingRooms);
-
-        //Choix de la prochaine action à effectuer
-        Action nextAction = NextActionChoice();
-
-        //Application de l'action
-        ActionApply(nextAction);
-    }
-
-    private void ActionApply(Action nextAction)
-    {
-        if(nextAction == Action.TIRER)
-            effecteur.Tirer(fringe.get(0));
+            throwsTried.put(nextRoom,nextAction);
+            effecteur.Tirer(nextRoom);
+            graph.UpdateLabel(nextRoom);
+        }
         else if(nextAction == Action.TELEPORTER)
-            effecteur.Teleportation(player, fringe.get(0));
+            effecteur.Teleportation(player, nextRoom);
     }
 
-    private Action NextActionChoice()
+    private Action NextActionChoice(Room actionRoom)
     {
-        CalculDanger();
-        if(fringe.get(0).facts.mayContainMonster)
+        if(actionRoom.facts.mayContainMonster && !throwsTried.containsKey(actionRoom))
            return Action.TIRER;
        else
            return Action.TELEPORTER;
     }
 
     //Ordonnencement des rooms frontières selon leurs dangers
-    private void CalculDanger()
+    private Room NextRoomChoice()
     {
         Collections.sort(fringe);
-        //TODO créer un choix probabiliste si 2 room ont le même niveau de danger
+        int smallestDangerValue = fringe.get(0).facts.danger;
+        ArrayList<Room> lessDangerousRooms = new ArrayList<>();
+        for (Room room : fringe) {
+            if(room.facts.danger == smallestDangerValue)
+                lessDangerousRooms.add(room);
+        }
+
+        //lessDangerousRooms = CalculateClosestRoom(lessDangerousRooms);
+        Random rand = new Random();
+        return lessDangerousRooms.get(rand.nextInt(lessDangerousRooms.size()));
     }
 
+  /*  private ArrayList<Room> CalculateClosestRoom(ArrayList<Room> lessDangerousRooms){
+        ArrayList<Room> closestRooms = new ArrayList<>();
+        double bestDistance = CalculateDistance(lessDangerousRooms.get(0));
+
+        for(Room room : lessDangerousRooms){
+            double roomDistance = CalculateDistance(room);
+            if(bestDistance > roomDistance)
+                bestDistance = roomDistance;
+        }
+
+        for(Room room : lessDangerousRooms){
+            if(bestDistance == CalculateDistance(room))
+                closestRooms.add(room);
+        }
+        return closestRooms;
+    }
+
+    private double CalculateDistance(Room room){
+        double distance;
+        distance = Math.sqrt((room.x- player.x) * (room.x- player.x) + (room.y- player.y) * (room.y- player.y) );
+        return distance;
+    }*/
 
     //Initialise la connaissance de l'agent : on ajoute la case sur laquelle il démarre à la liste des cases connues,
     // puis met à jour la frontière
@@ -104,6 +174,7 @@ public class Agent {
 
     private void UpdateAgentKnowledge()
     {
+        System.out.println("Player in ["+player.x+","+player.y+"]");
         //maj des faits avec capteurs
         if(DetectEnvironment(map[player.x][player.y]))
         {
@@ -113,6 +184,7 @@ public class Agent {
 
         //Initialisation de la frontiere
         UpdateFringe();
+        graph.UpdateGraphic(map, player, fringe);
     }
 
 
@@ -137,12 +209,15 @@ public class Agent {
             room.facts.isShiny = true;
             room.facts.isSafe = true;
             room.facts.containsExit = true;
+            room.facts.discoveredRoom = true;
             return true;
         }
 
         if(capteur.isThereNothing()){
             room.facts.isEmpty = true;
             room.facts.isSafe = true;
+            room.facts.discoveredRoom = true;
+            return false;
         }
 
         if(capteur.isThereSmell())
@@ -194,6 +269,22 @@ public class Agent {
             }
         }
 
+    }
+    @Override
+    public void run() {
+        while(agentRunning)
+        {
+           /* try {
+                if(!timerEnded){
+
+                    Thread.sleep(1000);
+                    timerEnded = true;
+                    System.out.println("Timer reset !");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
+        }
     }
 
 

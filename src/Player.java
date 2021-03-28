@@ -1,5 +1,6 @@
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Player {
 
@@ -8,11 +9,11 @@ public class Player {
 
     ArrayList<Point2D> pathTriedList;
 
-    public Player()
+    public Player(int n)
     {
-        x = 0;
-        y = 0;
         pathTriedList = new ArrayList<>();
+        Random rand = new Random();
+        SetPosition(rand.nextInt(n), rand.nextInt(n) );
     }
 
     public void SetPosition(int x, int y)

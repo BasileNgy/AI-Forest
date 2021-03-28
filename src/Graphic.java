@@ -27,7 +27,7 @@ public class Graphic extends JFrame
         f.setVisible(true);
     }
 
-    public void UpdateGraphic(Room[][] map, Player p)
+    public void UpdateGraphic(Room[][] map, Player p, ArrayList<Room> fringe)
     {
         int labelIndex = 0;
         for(int j=0;j<size;j++)
@@ -38,9 +38,16 @@ public class Graphic extends JFrame
                     text += " Joueu";
 
                 if(map[i][j].facts.discoveredRoom)
-                    labelList.get(labelIndex).setForeground(Color.red);
+                    labelList.get(labelIndex).setForeground(Color.BLUE);
+                if(fringe.contains(map[i][j]))
+                    labelList.get(labelIndex).setForeground(Color.ORANGE);
                 labelList.get(labelIndex).setText(text);
                 labelIndex ++;
             }
+    }
+    public void UpdateLabel(Room room){
+        room.SetGraphicText();
+        String text = room.graphicText;
+        labelList.get(room.x*size+ room.y).setText(text);
     }
 }
