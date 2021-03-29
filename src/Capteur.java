@@ -8,10 +8,10 @@ public class Capteur
         this.map = map;
         this.p = p;
     }
-/*
-    public void UpdateMap(Room[][] map){
-        this.map = map;
-    }*/
+
+    public void SetNewEnvironnement(Environnement envir){
+        this.map = envir.map;
+    }
 
     public  boolean isThereNothing(){
         return      !map[p.x][p.y].elementList.contains(Element.ODEUR)

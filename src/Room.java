@@ -64,6 +64,7 @@ public class Room implements Comparable<Room>
 
     public void SetGraphicText()
     {
+        graphicText = "";
         if(elementList.isEmpty())
             graphicText = "Vide";
 

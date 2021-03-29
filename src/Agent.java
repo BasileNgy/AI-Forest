@@ -8,7 +8,7 @@ enum Action
     TIRER, TELEPORTER
 }
 
-public class Agent implements Runnable{
+public class Agent {
 
     private int size;
     private final Capteur capteur;
@@ -24,8 +24,8 @@ public class Agent implements Runnable{
     public HashMap<Room, Action> throwsTried;
     public boolean exitReached;
     public boolean playerIsDead;
-    static boolean timerEnded = true;
     static boolean agentRunning;
+    private int performance;
 
     public Agent(Capteur capteur, Effecteur effecteur)
     {
@@ -33,7 +33,7 @@ public class Agent implements Runnable{
         this.effecteur = effecteur;
         moteur = new Moteur();
         rulesCreator = new RulesCreator(moteur);
-
+        performance = 0;
     }
 
     public void ResetAgent(Player p, int size, Room[][] map, Graphic graph){
@@ -49,58 +49,80 @@ public class Agent implements Runnable{
         throwsTried = new HashMap<>();
         exitReached = false;
         playerIsDead = false;
-//        timerEnded = true;
+//      timerEnded = true;
+
+        BeginningDetection();
     }
 
-    public boolean Resolution()
+    public void BeginningDetection()
     {
         if(InitAgentKnowledge()){
-            graph.UpdateGraphic(map, player, fringe);
             System.out.println("Exit reached !");
             exitReached = true;
             agentRunning = false;
-            return true;
         }
+        graph.UpdateGraphic(map, player, fringe, performance);
+    }
 
-        graph.UpdateGraphic(map, player, fringe);
-        do {
-                try{
-                    Thread.sleep(750);
-                    //Lancement de l'inférence
-                    moteur.Inference(interestingRooms);
-                    //Choix de la prochaine action à effectuer
-                    Room nextActionRoom = NextRoomChoice();
-                    Action nextAction = NextActionChoice(nextActionRoom);
+    public void Resolution()
+    {
+        if(!exitReached && !playerIsDead)
+        {
 
-                    //Application de l'action
-                    ActionApply(nextAction, nextActionRoom);
-                    //Mets à jours les faits grace aux capteurs et recalcule les frontières
-                    UpdateAgentKnowledge();
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
-        }while(!exitReached && !playerIsDead);
-        if(playerIsDead){
-            System.out.println("I died :/");
+
+            //Lancement de l'inférence
+            moteur.Inference(interestingRooms);
+
+            //Choix de la prochaine action à effectuer
+            Room nextActionRoom = NextRoomChoice();
+            Action nextAction = NextActionChoice(nextActionRoom);
+
+            //Application de l'action
+            ActionApply(nextAction, nextActionRoom);
+
+            //Mets à jours les faits grace aux capteurs et recalcule les frontières
+            UpdateAgentKnowledge();
+
+            graph.UpdateGraphic(map, player, fringe, performance);
+        }
+        else
+        {
             agentRunning = false;
-            return false;
-        }
-        System.out.println("Found exit ! :)");
-        agentRunning = false;
-        return true;
+            if(playerIsDead){
+                {
+                    System.out.println("I died :/");
+                    performance -= 10*size;
+                    CreateNewForest(3);
+                }
+            } else {
+                performance += 10*size;
+                CreateNewForest(size + 1);
+            }
 
+        }
+    }
+
+    private void CreateNewForest(int n)
+    {
+        main main = new main();
+        System.out.println("Found exit ! go to next forest :)");
+        main.CreateNewEnvironnement(n, player, this, capteur, effecteur, graph);
     }
 
     private void ActionApply(Action nextAction, Room nextRoom)
     {
-        if(nextAction == Action.TIRER){
-
+        if(nextAction == Action.TIRER)
+        {
             throwsTried.put(nextRoom,nextAction);
             effecteur.Tirer(nextRoom);
+            performance -= 10;
             graph.UpdateLabel(nextRoom);
         }
         else if(nextAction == Action.TELEPORTER)
+        {
             effecteur.Teleportation(player, nextRoom);
+            performance -= 1;
+        }
     }
 
     private Action NextActionChoice(Room actionRoom)
@@ -177,14 +199,12 @@ public class Agent implements Runnable{
         System.out.println("Player in ["+player.x+","+player.y+"]");
         //maj des faits avec capteurs
         if(DetectEnvironment(map[player.x][player.y]))
-        {
-            System.out.println("J'ai trouvé la sortie");
             exitReached = true;
-        }
+
 
         //Initialisation de la frontiere
         UpdateFringe();
-        graph.UpdateGraphic(map, player, fringe);
+        graph.UpdateGraphic(map, player, fringe, performance);
     }
 
 
@@ -269,22 +289,6 @@ public class Agent implements Runnable{
             }
         }
 
-    }
-    @Override
-    public void run() {
-        while(agentRunning)
-        {
-           /* try {
-                if(!timerEnded){
-
-                    Thread.sleep(1000);
-                    timerEnded = true;
-                    System.out.println("Timer reset !");
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
-        }
     }
 
 

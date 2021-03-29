@@ -7,6 +7,7 @@ public class RulesCreator {
     private Rule r1;
     private Rule r2;
     private Rule r3;
+    private Rule r4;
 
     public RulesCreator(Moteur moteur)
     {
@@ -38,9 +39,12 @@ public class RulesCreator {
                 },
                 room->{
                     for(Room voisin : room.neighbors){
-                        if(!voisin.facts.isSafe && !voisin.facts.discoveredRoom){
+                        if(!voisin.facts.isSafe && !voisin.facts.discoveredRoom && !room.facts.rockThrown){
+                            if(!voisin.facts.mayContainMonster)
+                                voisin.facts.danger += 10;
+
                             voisin.facts.mayContainMonster = true;
-                            voisin.facts.danger += 10;
+
                         }
                     }
                 },
@@ -56,17 +60,34 @@ public class RulesCreator {
                 room->{
                     for(Room voisin : room.neighbors){
                         if(!voisin.facts.isSafe && !voisin.facts.discoveredRoom){
+                            if(!voisin.facts.mayContainCanyon)
+                                voisin.facts.danger += 100;
                             voisin.facts.mayContainCanyon = true;
-                            voisin.facts.danger += 100;
+
                         }
                     }
                 },
                 3
         );
 
+        //Le joueur a tiré sur cette case, on retire le fait mayContainMonster et on diminue le niceau de danger de la case
+        r4 = new Rule(
+                room -> {
+                    if(room.facts.rockThrown) return true;
+                    else return false;
+                },
+                room->{
+                    if(room.facts.mayContainMonster)
+                        room.facts.danger -= 10;
+                    room.facts.mayContainMonster = false;
+                },
+                4
+        );
+
         moteur.rulesList.add(r1);
         moteur.rulesList.add(r2);
         moteur.rulesList.add(r3);
+        moteur.rulesList.add(r4);
         Collections.sort(moteur.rulesList);
         for(Rule rule : moteur.rulesList){
             moteur.markedRules.put(rule, new ArrayList<>());

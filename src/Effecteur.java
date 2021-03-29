@@ -9,10 +9,11 @@ public class Effecteur
         this.env = env;
         this.map = env.map;
     }
-  /*  public void UpdateEnv(Environnement env){
+
+    public void SetNewEnvironnement(Environnement env){
         this.env = env;
         this.map = env.map;
-    }*/
+    }
 
     public void Teleportation(Player p, Room r)
     {
@@ -25,12 +26,14 @@ public class Effecteur
     public void Tirer(Room r)
     {
         System.out.println("Tirer sur la case : "+ r.toString());
+        r.facts.rockThrown = true;
         if(r.elementList.contains(Element.MONSTRE))
         {
             r.elementList.remove(Element.MONSTRE);
+            for(Room room : r.neighbors)
+                room.elementList.remove(Element.ODEUR);
             System.out.println("Un monstre a été tué sur la case "+r.toString());
             env.UpdateNeighborKnowledge();
-
         }
     }
 

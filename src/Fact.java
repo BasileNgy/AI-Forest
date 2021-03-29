@@ -30,6 +30,7 @@ public class Fact {
     public boolean containsMonster;
     public boolean containsCanyon;
     public boolean containsExit;
+    public boolean rockThrown;
 
     public int danger;
 
@@ -53,6 +54,7 @@ public class Fact {
         containsMonster = false;
         containsCanyon = false;
         containsExit = false;
+        rockThrown = false;
     }
 
     @Override

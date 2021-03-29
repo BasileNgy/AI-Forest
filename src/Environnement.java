@@ -73,37 +73,46 @@ public class Environnement
     private void SetUpSortie()
     {
         Random rand = new Random();
-        float randNbm;
-        float probaSortie = 1f/(size*size);
+        int randNbmX;
+        int randNbmY;
 
-        outer:
-        for(int j=0;j<size;j++)
-        {
-            for(int i=0;i<size;i++)
-            {
-                //sécurité pour s'assurer que la sortie soit assignée
-                if(j == size-1 && i == size-1)
-                    probaSortie = 1;
+        randNbmX = rand.nextInt(size);
+        randNbmY = rand.nextInt(size);
 
-                randNbm = rand.nextFloat();
+        System.out.println("Sortie added to map ["+randNbmX+","+randNbmY+"]");
+        map[randNbmX][randNbmY].AddElement(Element.SORTIE);
+        exit = map[randNbmX][randNbmY];
+        for (Room neighbor : exit.neighbors)
+            if(neighbor.x != player.x && neighbor.y != player.y)
+                neighbor.AddElement(Element.MONSTRE);
 
-                if (randNbm <= probaSortie)
-                {
-                    System.out.println("Sortie added to map ["+i+","+j+"]");
-                    map[i][j].AddElement(Element.SORTIE);
-
-                    exit = map[i][j];
-                    for (Room neighbor : exit.neighbors) {
-                        if(neighbor.x != player.x && neighbor.y != player.y)
-                        neighbor.AddElement(Element.MONSTRE);
-                    }
-                    break outer;
-                }
-                else
-                    probaSortie += probaSortie;
-            }
-        }
-//        map[1][0].AddElement(Element.SORTIE);
+//        outer:
+//        for(int j=0;j<size;j++)
+//        {
+//            for(int i=0;i<size;i++)
+//            {
+//                //sécurité pour s'assurer que la sortie soit assignée
+//                if(j == size-1 && i == size-1)
+//                    probaSortie = 1;
+//
+//                randNbm = rand.nextFloat();
+//
+//                if (randNbm <= probaSortie)
+//                {
+//                    System.out.println("Sortie added to map ["+i+","+j+"]");
+//                    map[i][j].AddElement(Element.SORTIE);
+//
+//                    exit = map[i][j];
+//                    for (Room neighbor : exit.neighbors) {
+//                        if(neighbor.x != player.x && neighbor.y != player.y)
+//                        neighbor.AddElement(Element.MONSTRE);
+//                    }
+//                    break outer;
+//                }
+//                else
+//                    probaSortie += 1f/(size*size);
+//            }
+//        }
     }
 
     /*
