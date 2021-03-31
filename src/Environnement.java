@@ -70,8 +70,7 @@ public class Environnement
     Mets en place la sortie dans l'environnement, la sortie est unique et obligatoire
     La probabilité augmente de 1/size² à chaque itération
      */
-    private void SetUpSortie()
-    {
+    private void SetUpSortie() {
         Random rand = new Random();
         int randNbmX;
         int randNbmY;
@@ -79,40 +78,14 @@ public class Environnement
         randNbmX = rand.nextInt(size);
         randNbmY = rand.nextInt(size);
 
-        System.out.println("Sortie added to map ["+randNbmX+","+randNbmY+"]");
+        System.out.println("Sortie added to map [" + randNbmX + "," + randNbmY + "]");
         map[randNbmX][randNbmY].AddElement(Element.SORTIE);
         exit = map[randNbmX][randNbmY];
         for (Room neighbor : exit.neighbors)
-            if(neighbor.x != player.x && neighbor.y != player.y)
+            if (neighbor.x != player.x || neighbor.y != player.y)
                 neighbor.AddElement(Element.MONSTRE);
 
-//        outer:
-//        for(int j=0;j<size;j++)
-//        {
-//            for(int i=0;i<size;i++)
-//            {
-//                //sécurité pour s'assurer que la sortie soit assignée
-//                if(j == size-1 && i == size-1)
-//                    probaSortie = 1;
-//
-//                randNbm = rand.nextFloat();
-//
-//                if (randNbm <= probaSortie)
-//                {
-//                    System.out.println("Sortie added to map ["+i+","+j+"]");
-//                    map[i][j].AddElement(Element.SORTIE);
-//
-//                    exit = map[i][j];
-//                    for (Room neighbor : exit.neighbors) {
-//                        if(neighbor.x != player.x && neighbor.y != player.y)
-//                        neighbor.AddElement(Element.MONSTRE);
-//                    }
-//                    break outer;
-//                }
-//                else
-//                    probaSortie += 1f/(size*size);
-//            }
-//        }
+
     }
 
     /*
@@ -128,7 +101,7 @@ public class Environnement
                 randMonster = rand.nextFloat();
                 randCrevasse = rand.nextFloat();
 
-                if (i != player.x && j != player.y && i != exit.x && j != exit.y) {
+                if ( (i != player.x || j != player.y) && (i != exit.x || j != exit.y) ) {
                     if (randMonster < probaMonstre)
                         map[i][j].AddElement(Element.MONSTRE);
 
@@ -148,8 +121,10 @@ public class Environnement
                 if (room.elementList.contains(Element.MONSTRE) || room.elementList.contains(Element.CREVASSE)) {
 
                     for (Room neighbor : room.neighbors) {
-                        if (room.elementList.contains(Element.MONSTRE))
+                        if (room.elementList.contains(Element.MONSTRE)){
                             neighbor.AddElement(Element.ODEUR);
+
+                        }
 
                         if (room.elementList.contains(Element.CREVASSE))
                             neighbor.AddElement(Element.VENTEUSE);

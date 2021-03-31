@@ -20,9 +20,6 @@ public class Moteur {
     public void Inference(ArrayList<Room> inferenceRooms){
 
         this.inferenceRooms = inferenceRooms;
-        for(Room room : inferenceRooms ){
-            //System.out.println("Interesting room in ["+room.x+","+room.y+"]");
-        }
         applicableRules.clear();
         for(Rule rule : markedRules.keySet()){
             markedRules.get(rule).clear();

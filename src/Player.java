@@ -9,11 +9,9 @@ public class Player {
 
     ArrayList<Point2D> pathTriedList;
 
-    public Player(int n)
+    public Player()
     {
         pathTriedList = new ArrayList<>();
-        Random rand = new Random();
-        SetPosition(rand.nextInt(n), rand.nextInt(n) );
     }
 
     public void SetPosition(int x, int y)

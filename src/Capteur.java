@@ -3,9 +3,8 @@ public class Capteur
     Room[][] map;
     Player p;
 
-    public Capteur(Room[][] map, Player p)
+    public Capteur( Player p)
     {
-        this.map = map;
         this.p = p;
     }
 

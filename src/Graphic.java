@@ -61,37 +61,59 @@ public class Graphic extends JFrame
         p.setLayout(new GridLayout(n,n));
     }
 
-    public void UpdateGraphic(Room[][] map, Player p, ArrayList<Room> fringe, int performance)
-    {
-        int labelIndex = 0;
-        for(int j=0;j<size;j++)
-            for(int i=0;i<size;i++)
-            {
-                String text = map[i][j].graphicText;
-                if(i == p.x && j == p.y)
-                    text += " Joueu";
-
-                JLabel lab = labelList.get(labelIndex);
-
-                if(map[i][j].facts.discoveredRoom)
-                    lab.setForeground(Color.BLUE);
-                if(fringe.contains(map[i][j]))
-                    lab.setForeground(Color.ORANGE);
-
-                lab.setText(text);
-                lab.setHorizontalAlignment(SwingConstants.CENTER);
-                lab.setVerticalAlignment(SwingConstants.CENTER);
-
-                performLabel.setVerticalAlignment(SwingConstants.CENTER);
-                performLabel.setText("Performance :" + performance);
-
-                labelIndex ++;
+    public void UpdateGraphic(Room[][] map, Player p, ArrayList<Room> fringe, int performance) {
+        for (int j = 0; j < size; j++){
+            for (int i = 0; i < size; i++) {
+                Room room = map[i][j];
+                UpdateLabel(room, p, fringe);
             }
+        }
+        performLabel.setText("Performance :" + performance);
     }
 
-    public void UpdateLabel(Room room){
+    public void UpdateLabel(Room room, Player p, ArrayList<Room> fringe){
+
+        int labelIndex = room.y * size + room.x;
+
         room.SetGraphicText();
         String text = room.graphicText;
-        labelList.get(room.x*size+ room.y).setText(text);
+        JLabel lab = labelList.get(labelIndex);
+
+        if (room.facts.discoveredRoom)
+            lab.setForeground(Color.BLUE);
+
+        else if (fringe.contains(room)){
+
+            lab.setForeground(Color.ORANGE);
+
+
+            if (room.facts.globalDanger > 0) {
+                lab.setForeground(Color.RED);
+                if (!room.facts.containsMonster && !room.facts.containsCrevasse) {
+                    text = "Dangerous : M(" + room.facts.monsterDanger + ") C(" + room.facts.crevasseDanger + ") G(" + room.facts.globalDanger + ")";
+                } else if (room.facts.containsCrevasse && room.facts.containsMonster) {
+                    text = "Dangerous ! Monster & Crevasse !";
+                } else if (room.facts.containsCrevasse) {
+                    text = "Dangerous ! Crevasse ! M(" + room.facts.monsterDanger + ") G(" + room.facts.globalDanger + ")";
+                } else if (room.facts.containsMonster) {
+                    text = "Dangerous ! Monster ! C(" + room.facts.crevasseDanger + ") G(" + room.facts.globalDanger + ")";
+                }
+            } else if (room.facts.isSafe) text = "Safe !";
+
+
+            if(room.facts.rockThrown){
+                text = "Cleared";
+                lab.setForeground(Color.ORANGE);
+            }
+
+        }
+        if (room.x == p.x && room.y == p.y) {
+            text += " Joueur";
+            lab.setForeground(Color.GREEN);
+        }
+
+        lab.setText(text);
+        lab.setHorizontalAlignment(SwingConstants.CENTER);
+        lab.setVerticalAlignment(SwingConstants.CENTER);
     }
 }

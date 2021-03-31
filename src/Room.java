@@ -83,7 +83,7 @@ public class Room implements Comparable<Room>
 
     @Override
     public int compareTo(Room o) {
-        return this.facts.danger - o.facts.danger;
+        return this.facts.globalDanger - o.facts.globalDanger;
     }
 
     @Override

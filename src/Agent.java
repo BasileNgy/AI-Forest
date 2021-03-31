@@ -36,12 +36,10 @@ public class Agent {
         performance = 0;
     }
 
-    public void ResetAgent(Player p, int size, Room[][] map, Graphic graph){
+    public void ResetAgent(Player p, int size){
         agentRunning = true;
         this.size = size;
         this.player = p;
-        this.map = map;
-        this.graph = graph;
 
         interestingRooms = new ArrayList<>();
         knownRooms = new ArrayList<>();
@@ -49,9 +47,14 @@ public class Agent {
         throwsTried = new HashMap<>();
         exitReached = false;
         playerIsDead = false;
-//      timerEnded = true;
 
-        BeginningDetection();
+        Random rand = new Random();
+        this.player.SetPosition(rand.nextInt(size), rand.nextInt(size));
+    }
+
+    public void SetMap(Room[][] map, Graphic graph){
+        this.map = map;
+        this.graph = graph;
     }
 
     public void BeginningDetection()
@@ -69,10 +72,6 @@ public class Agent {
         if(!exitReached && !playerIsDead)
         {
 
-
-            //Lancement de l'inférence
-            moteur.Inference(interestingRooms);
-
             //Choix de la prochaine action à effectuer
             Room nextActionRoom = NextRoomChoice();
             Action nextAction = NextActionChoice(nextActionRoom);
@@ -80,10 +79,15 @@ public class Agent {
             //Application de l'action
             ActionApply(nextAction, nextActionRoom);
 
+            for(Room fringeRoom : fringe){
+
+                fringeRoom.facts.globalDanger = 0;
+                fringeRoom.facts.crevasseDanger = 0;
+                fringeRoom.facts.monsterDanger = 0;
+            }
+
             //Mets à jours les faits grace aux capteurs et recalcule les frontières
             UpdateAgentKnowledge();
-
-            graph.UpdateGraphic(map, player, fringe, performance);
         }
         else
         {
@@ -92,6 +96,7 @@ public class Agent {
                 {
                     System.out.println("I died :/");
                     performance -= 10*size;
+
                     CreateNewForest(3);
                 }
             } else {
@@ -101,6 +106,7 @@ public class Agent {
 
         }
     }
+
 
     private void CreateNewForest(int n)
     {
@@ -116,18 +122,20 @@ public class Agent {
             throwsTried.put(nextRoom,nextAction);
             effecteur.Tirer(nextRoom);
             performance -= 10;
-            graph.UpdateLabel(nextRoom);
+            graph.UpdateLabel(nextRoom, player, fringe);
+            for (Room room : nextRoom.neighbors)
+                graph.UpdateLabel(room, player, fringe);
         }
         else if(nextAction == Action.TELEPORTER)
         {
-            effecteur.Teleportation(player, nextRoom);
+            effecteur.Teleportation(nextRoom);
             performance -= 1;
         }
     }
 
     private Action NextActionChoice(Room actionRoom)
     {
-        if(actionRoom.facts.mayContainMonster && !throwsTried.containsKey(actionRoom))
+        if(actionRoom.facts.monsterDanger > 0 && !throwsTried.containsKey(actionRoom))
            return Action.TIRER;
        else
            return Action.TELEPORTER;
@@ -137,10 +145,10 @@ public class Agent {
     private Room NextRoomChoice()
     {
         Collections.sort(fringe);
-        int smallestDangerValue = fringe.get(0).facts.danger;
+        int smallestDangerValue = fringe.get(0).facts.globalDanger;
         ArrayList<Room> lessDangerousRooms = new ArrayList<>();
         for (Room room : fringe) {
-            if(room.facts.danger == smallestDangerValue)
+            if(room.facts.globalDanger == smallestDangerValue)
                 lessDangerousRooms.add(room);
         }
 
@@ -191,6 +199,11 @@ public class Agent {
 
         //Initialisation de la frontiere
         UpdateFringe();
+
+
+        //Lancement de l'inférence
+        moteur.Inference(interestingRooms);
+
         return false;
     }
 
@@ -202,9 +215,14 @@ public class Agent {
             exitReached = true;
 
 
-        //Initialisation de la frontiere
+        //Update de la frontiere
         UpdateFringe();
+
+        //Lancement de l'inférence
+        moteur.Inference(interestingRooms);
+
         graph.UpdateGraphic(map, player, fringe, performance);
+
     }
 
 
@@ -222,7 +240,7 @@ public class Agent {
         room.facts.isSafe = false;
 
         room.facts.containsMonster = false;
-        room.facts.containsCanyon = false;
+        room.facts.containsCrevasse = false;
         room.facts.containsExit = false;
 
         if(capteur.isItShining()){
@@ -250,9 +268,9 @@ public class Agent {
             room.facts.containsMonster = true;
 
         if ( capteur.isThereRift() )
-            room.facts.containsCanyon = true;
+            room.facts.containsCrevasse = true;
 
-        if(room.facts.containsCanyon || room.facts.containsMonster){
+        if(room.facts.containsCrevasse || room.facts.containsMonster){
             playerIsDead = true;
             return  false;
         }
@@ -270,6 +288,7 @@ public class Agent {
             for(Room neigbhor : room.neighbors){
                 if(!neigbhor.facts.discoveredRoom && !fringe.contains(neigbhor))
                     fringe.add(neigbhor);
+
             }
         }
         UpdateInterestingRooms();

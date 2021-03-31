@@ -1,21 +1,32 @@
- public class main
+import java.util.Random;
+
+public class main
 {
 
 
     public static void main(String[] args)
     {
 
-        int n = 3;
+        int n = 9;
 //        boolean keepPlaying = true;
 
-        Player player = new Player(n);
+        Player player = new Player();
+        Capteur capteur = new Capteur(player);
+        Effecteur effecteur = new Effecteur(player);
+
+        Agent agent = new Agent(capteur, effecteur);
+        agent.ResetAgent(player, n);
+
+
         Environnement envir = new Environnement(n, player);
         envir.SetUpInitialState();
-        Capteur capteur = new Capteur(envir.map, player);
-        Effecteur effecteur = new Effecteur(envir);
-        Agent agent = new Agent(capteur, effecteur);
+
+        capteur.SetNewEnvironnement(envir);
+        effecteur.SetNewEnvironnement(envir);
+
         Graphic graph = new Graphic(n, agent);
-        agent.ResetAgent(player, n, envir.map, graph);
+        agent.SetMap(envir.map, graph);
+        agent.BeginningDetection();
 
 //        main obj = new main();
 //        Thread mainThread = new Thread(obj);
@@ -52,6 +63,9 @@
 
     public void CreateNewEnvironnement(int n, Player player, Agent agent, Capteur capteur, Effecteur effecteur, Graphic graph)
     {
+
+        agent.ResetAgent(player, n);
+
         Environnement envir = new Environnement(n, player);
         envir.SetUpInitialState();
 
@@ -60,7 +74,9 @@
 
         graph.SetNewEnvironnement(n);
 
-        agent.ResetAgent(player, n, envir.map, graph);
+        agent.SetMap(envir.map, graph);
+        agent.BeginningDetection();
+
     }
 
 }
