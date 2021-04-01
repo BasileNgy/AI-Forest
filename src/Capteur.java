@@ -12,6 +12,11 @@ public class Capteur
         this.map = envir.map;
     }
 
+
+    /*
+    Méthodes Capteurs
+    retour booléen si l'élément est présent ou non
+     */
     public  boolean isThereNothing(){
         return      !map[p.x][p.y].elementList.contains(Element.ODEUR)
                 &&  !map[p.x][p.y].elementList.contains(Element.VENTEUSE)

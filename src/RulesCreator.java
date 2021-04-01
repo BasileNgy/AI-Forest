@@ -76,7 +76,7 @@ public class RulesCreator {
                 3
         );
 
-        //Le joueur a tiré sur cette case, on retire le fait mayContainMonster et on diminue le niceau de danger de la case
+        //Le joueur a tiré sur cette case, on retire le fait mayContainMonster
         r4 = new Rule(
                 room -> {
                     if(room.facts.rockThrown) return true;
@@ -93,6 +93,7 @@ public class RulesCreator {
                 4
         );
 
+        //si le niveau de danger correspond à l'ensemble des cases adjacentes à cette case, alors on admets qu'un monstre s'y trouve
         r5 = new Rule(
                 room -> {
                     if(room.facts.monsterDanger == room.neighbors.size() * 10) return true;
@@ -107,6 +108,7 @@ public class RulesCreator {
 
         );
 
+        //si le niveau de danger correspond à l'ensemble des cases adjacentes à cette case, alors on admets qu'une crevasse s'y trouve
         r6 = new Rule(
                 room -> {
                     if(room.facts.crevasseDanger == room.neighbors.size() * 100) return true;
@@ -120,6 +122,7 @@ public class RulesCreator {
                 6
         );
 
+        //Si le danger est nul alors la case ne présente pas de danger
         r7 = new Rule(
                 room -> {
                     if(room.facts.globalDanger == 0) return true;
@@ -132,6 +135,8 @@ public class RulesCreator {
                 7
         );
 
+        //Si une case odorante ne possède qu'une seule adjacente contenant possiblement un monstre,
+        // alors on admets que le monstre est présent sur cette case adjacente
         r8 = new Rule(
                 room -> {
                     if (room.facts.isSmelly) {
@@ -158,6 +163,8 @@ public class RulesCreator {
 
         );
 
+        //Si une case venteuse ne possède qu'une seule adjacente contenant possiblement une crevasse,
+        // alors on admets que la crevasse est présent sur cette case adjacente
         r9 = new Rule(
                 room -> {
                     if (room.facts.isWindy) {

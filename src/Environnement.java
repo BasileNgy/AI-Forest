@@ -43,7 +43,7 @@ public class Environnement
     }
 
     /*
-    Liste les cases voisines les unes des autres et les ajoute à l'attribut liste des room
+    Liste les cases voisines les unes des autres et les ajoute à l'attribut neighbour
      */
     private void SetUpNeighbourRoom()
     {
@@ -67,8 +67,7 @@ public class Environnement
     }
 
     /*
-    Mets en place la sortie dans l'environnement, la sortie est unique et obligatoire
-    La probabilité augmente de 1/size² à chaque itération
+    Mets en place la sortie dans l'environnement de manière aléatoire, la sortie est unique et obligatoire
      */
     private void SetUpSortie() {
         Random rand = new Random();
@@ -81,11 +80,6 @@ public class Environnement
         System.out.println("Sortie added to map [" + randNbmX + "," + randNbmY + "]");
         map[randNbmX][randNbmY].AddElement(Element.SORTIE);
         exit = map[randNbmX][randNbmY];
-        for (Room neighbor : exit.neighbors)
-            if (neighbor.x != player.x || neighbor.y != player.y)
-                neighbor.AddElement(Element.MONSTRE);
-
-
     }
 
     /*
@@ -112,6 +106,9 @@ public class Environnement
         }
     }
 
+    /*
+    Remets à jours les éléments Odeur et Vent de toutes les cases
+     */
     public void UpdateNeighborKnowledge() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {

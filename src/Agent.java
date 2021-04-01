@@ -36,6 +36,9 @@ public class Agent {
         performance = 0;
     }
 
+    /*
+    Reset des paramètres de l'agent pour commencer sur une nouvelle forêt
+     */
     public void ResetAgent(Player p, int size){
         agentRunning = true;
         this.size = size;
@@ -57,6 +60,9 @@ public class Agent {
         this.graph = graph;
     }
 
+    /*
+    Première détection de l'environnement et inférence, permet de détecter si le joueur n'est pas sur la sortie
+     */
     public void BeginningDetection()
     {
         if(InitAgentKnowledge()){
@@ -67,6 +73,11 @@ public class Agent {
         graph.UpdateGraphic(map, player, fringe, performance);
     }
 
+    /*
+    Cycle de résolution, méthode appelé par le bouton graphique
+    Choisi l'action à appliquer, l'applique puis détecte l'environnement
+    sur la nouvelle case et éxécte un nouveau cycle d'inférence
+     */
     public void Resolution()
     {
         if(!exitReached && !playerIsDead)
@@ -79,8 +90,8 @@ public class Agent {
             //Application de l'action
             ActionApply(nextAction, nextActionRoom);
 
-            for(Room fringeRoom : fringe){
-
+            //RAZ des dangers
+            for(Room fringeRoom : fringe) {
                 fringeRoom.facts.globalDanger = 0;
                 fringeRoom.facts.crevasseDanger = 0;
                 fringeRoom.facts.monsterDanger = 0;
@@ -92,6 +103,7 @@ public class Agent {
         else
         {
             agentRunning = false;
+            //
             if(playerIsDead){
                 {
                     System.out.println("I died :/");
@@ -107,14 +119,18 @@ public class Agent {
         }
     }
 
-
+    /*
+    Création d'une nouvelle forêt de dimension n, raz des éléments agent, Player, Capteur, Effecteur et graphique
+     */
     private void CreateNewForest(int n)
     {
         main main = new main();
-        System.out.println("Found exit ! go to next forest :)");
         main.CreateNewEnvironnement(n, player, this, capteur, effecteur, graph);
     }
 
+    /*
+    Application de a prochaine action à effectuer
+     */
     private void ActionApply(Action nextAction, Room nextRoom)
     {
         if(nextAction == Action.TIRER)
@@ -133,6 +149,9 @@ public class Agent {
         }
     }
 
+    /*
+    Détermine l'action à effectuer selon si la prochaine room contient un monstre ou non
+     */
     private Action NextActionChoice(Room actionRoom)
     {
         if(actionRoom.facts.monsterDanger > 0 && !throwsTried.containsKey(actionRoom))
@@ -141,7 +160,10 @@ public class Agent {
            return Action.TELEPORTER;
     }
 
-    //Ordonnencement des rooms frontières selon leurs dangers
+    /*
+    Ordonnencement des rooms frontières selon leurs dangers
+    Retourne une des rooms avec le niveau de danger le plus bas
+     */
     private Room NextRoomChoice()
     {
         Collections.sort(fringe);
@@ -152,36 +174,12 @@ public class Agent {
                 lessDangerousRooms.add(room);
         }
 
-        //lessDangerousRooms = CalculateClosestRoom(lessDangerousRooms);
         Random rand = new Random();
         return lessDangerousRooms.get(rand.nextInt(lessDangerousRooms.size()));
     }
 
-  /*  private ArrayList<Room> CalculateClosestRoom(ArrayList<Room> lessDangerousRooms){
-        ArrayList<Room> closestRooms = new ArrayList<>();
-        double bestDistance = CalculateDistance(lessDangerousRooms.get(0));
-
-        for(Room room : lessDangerousRooms){
-            double roomDistance = CalculateDistance(room);
-            if(bestDistance > roomDistance)
-                bestDistance = roomDistance;
-        }
-
-        for(Room room : lessDangerousRooms){
-            if(bestDistance == CalculateDistance(room))
-                closestRooms.add(room);
-        }
-        return closestRooms;
-    }
-
-    private double CalculateDistance(Room room){
-        double distance;
-        distance = Math.sqrt((room.x- player.x) * (room.x- player.x) + (room.y- player.y) * (room.y- player.y) );
-        return distance;
-    }*/
-
     //Initialise la connaissance de l'agent : on ajoute la case sur laquelle il démarre à la liste des cases connues,
-    // puis met à jour la frontière
+    // puis met à jour la frontière et lancement du moteur d'inférence
     public boolean InitAgentKnowledge()
     {
         knownRooms.clear();
@@ -207,6 +205,9 @@ public class Agent {
         return false;
     }
 
+    /*
+    Mets à jour les connaissances de l'agent, la frontière et lance le cycle d'inférence
+    */
     private void UpdateAgentKnowledge()
     {
         System.out.println("Player in ["+player.x+","+player.y+"]");

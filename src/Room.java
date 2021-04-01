@@ -23,6 +23,10 @@ public class Room implements Comparable<Room>
         facts = new Fact(x,y);
     }
 
+    /*
+    Permet d'ajouter un élément à une case sous certaines conditions, par exemple,
+    ne peux pas ajouter de monstre/crevasse sur la case de sortie
+     */
     public boolean AddElement(Element e)
     {
         boolean added = true;
@@ -62,6 +66,9 @@ public class Room implements Comparable<Room>
         return added;
     }
 
+    /*
+    Concatène les éléments présent dans la case sous forme d'une seule String
+     */
     public void SetGraphicText()
     {
         graphicText = "";
