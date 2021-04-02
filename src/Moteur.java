@@ -17,6 +17,13 @@ public class Moteur {
         markedRules = new HashMap<>();
     }
 
+    /*
+    Applique le cycle d'inférence :
+    - test les règles applicables
+    - applique la règle
+    - marque la règle
+    tant que la liste de règles applicables n'est pas vide
+     */
     public void Inference(ArrayList<Room> inferenceRooms){
 
         this.inferenceRooms = inferenceRooms;
@@ -32,21 +39,21 @@ public class Moteur {
                 if(applicableRules.get(rule).isEmpty())
                     applicableRules.remove(rule);
             }
-            //System.out.println("Applicable rules "+applicableRules);
             if(!applicableRules.isEmpty()){
                 Map.Entry<Rule, ArrayList<Room>> firstRuleApplicable = applicableRules.entrySet().iterator().next();
                 Rule ruleToApply = firstRuleApplicable.getKey();
                 Room roomToApply = firstRuleApplicable.getValue().get(0);
                 ruleToApply.consequence.apply(roomToApply);
                 markedRules.get(ruleToApply).add(roomToApply);
-                //System.out.println("Applied rule "+ruleToApply+" on room ["+roomToApply.x+","+roomToApply.y+"]");
             }
-            //System.out.println("Marked rules " +markedRules);
 
         } while ( !applicableRules.isEmpty());
 
     }
 
+    /*
+    Test l'ensemble des rooms sur une règle, les règles applicables sont ajoutées à la liste
+     */
     public void IsRuleApplicable(Rule rule){
         for(Room room : inferenceRooms){
 
