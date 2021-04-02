@@ -6,13 +6,14 @@ public class main
     public static void main(String[] args)
     {
 
+        main main = new main();
         int n = 3;
 
         Player player = new Player();
         Capteur capteur = new Capteur(player);
         Effecteur effecteur = new Effecteur(player);
 
-        Agent agent = new Agent(capteur, effecteur);
+        Agent agent = new Agent(capteur, effecteur, main);
         agent.ResetAgent(player, n);
 
 

@@ -74,7 +74,7 @@ public class Graphic extends JFrame
     }
 
     /*
-    RAZ du pnale et de la list de label, initialisation de n² labels
+    RAZ du panel et de la list de label, initialisation de n² labels
      */
     public void SetNewEnvironnement(int n)
     {
@@ -118,6 +118,10 @@ public class Graphic extends JFrame
         String text = room.graphicText;
         JLabel lab = labelList.get(labelIndex);
 
+        if (room.elementList.contains(Element.SORTIE)) {
+            lab.setForeground(Color.GREEN);
+        }
+
         if (room.facts.discoveredRoom)
             lab.setForeground(Color.BLUE);
 
@@ -145,9 +149,10 @@ public class Graphic extends JFrame
                 lab.setForeground(Color.ORANGE);
             }
 
-        }
-        if (room.elementList.contains(Element.SORTIE)) {
-            lab.setForeground(Color.GREEN);
+
+            if (room.elementList.contains(Element.SORTIE))
+                text += "(Sortie)";
+
         }
 
         if (room.x == p.x && room.y == p.y) {

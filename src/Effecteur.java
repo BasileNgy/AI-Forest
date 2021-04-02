@@ -16,7 +16,7 @@ public class Effecteur
     }
 
     /*
-    Déplace le joueur sur la case choisi
+    Déplace le joueur sur la case choisie
      */
     public void Teleportation(Room r)
     {
@@ -27,7 +27,7 @@ public class Effecteur
     }
 
     /*
-    Tire une roche sur la Room r, retire le monstre de la case, retire l'odeur des case voisines
+    Tire une roche sur la Room r, retire le monstre de la case, retire l'odeur des cases voisines
     Puis remets à jour l'environnement
      */
     public void Tirer(Room r)

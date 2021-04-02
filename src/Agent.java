@@ -1,3 +1,5 @@
+import com.sun.tools.javac.Main;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,14 +28,16 @@ public class Agent {
     public boolean playerIsDead;
     static boolean agentRunning;
     private int performance;
+    private main main;
 
-    public Agent(Capteur capteur, Effecteur effecteur)
+    public Agent(Capteur capteur, Effecteur effecteur, main main)
     {
         this.capteur = capteur;
         this.effecteur = effecteur;
         moteur = new Moteur();
         rulesCreator = new RulesCreator(moteur);
         performance = 0;
+        this.main = main;
     }
 
     /*
@@ -74,9 +78,9 @@ public class Agent {
     }
 
     /*
-    Cycle de résolution, méthode appelé par le bouton graphique
+    Cycle de résolution, méthode appelée par le bouton graphique
     Choisi l'action à appliquer, l'applique puis détecte l'environnement
-    sur la nouvelle case et éxécte un nouveau cycle d'inférence
+    sur la nouvelle case et exécute un nouveau cycle d'inférence
      */
     public void Resolution()
     {
@@ -124,7 +128,6 @@ public class Agent {
      */
     private void CreateNewForest(int n)
     {
-        main main = new main();
         main.CreateNewEnvironnement(n, player, this, capteur, effecteur, graph);
     }
 

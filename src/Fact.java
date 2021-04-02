@@ -8,13 +8,13 @@ public class Fact {
 
     public boolean discoveredRoom;
 
+
+
+    //certitudes
     public boolean isEmpty;
     public boolean isWindy;
     public boolean isSmelly;
     public boolean isShiny;
-
-
-    //certitudes
     public boolean isSafe;
     public boolean containsMonster;
     public boolean containsCrevasse;

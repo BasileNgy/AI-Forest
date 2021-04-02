@@ -22,7 +22,7 @@ public class Moteur {
     - test les règles applicables
     - applique la règle
     - marque la règle
-    tant que la liste de règles applicables n'est pas vide
+    tant que la liste de règles applicables n'est pas vide ou que toutes les règles applicable ne sont pas marquées
      */
     public void Inference(ArrayList<Room> inferenceRooms){
 
@@ -52,14 +52,13 @@ public class Moteur {
     }
 
     /*
-    Test l'ensemble des rooms sur une règle, les règles applicables sont ajoutées à la liste
+    Test une règle sur l'ensemble des rooms, les règles applicables sont ajoutées à la liste
      */
     public void IsRuleApplicable(Rule rule){
         for(Room room : inferenceRooms){
 
             if(!markedRules.get(rule).contains(room) && rule.premise.check(room))
                 applicableRules.get(rule).add(room);
-            else ;//System.out.println("Can't apply rule "+rule+" to room ["+room.x+","+room.y+"]");
         }
     }
 
